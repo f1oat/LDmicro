@@ -22,6 +22,7 @@
     <ProjectGuid>{934C13CD-BFB1-4664-8431-C7A6804F5C0E}</ProjectGuid>
     <Keyword>MakeFileProj</Keyword>
     <ProjectName>LDmicro</ProjectName>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -63,16 +64,27 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <NMakeBuildCommandLine>make.bat</NMakeBuildCommandLine>
+    <NMakeBuildCommandLine>cd $(ProjectDir)..
+make.bat</NMakeBuildCommandLine>
     <NMakeOutput>VisualStudio.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <NMakeBuildCommandLine>make.bat</NMakeBuildCommandLine>
-    <NMakeOutput>VisualStudio.exe</NMakeOutput>
+    <NMakeBuildCommandLine>cd $(ProjectDir)..
+nmake D=LDLANG_EN</NMakeBuildCommandLine>
+    <NMakeOutput>$(ProjectDir)..\ldmicro.exe</NMakeOutput>
     <NMakePreprocessorDefinitions>WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeReBuildCommandLine>cd $(ProjectDir)..
+nmake clean
+nmake D=LDLANG_EN</NMakeReBuildCommandLine>
+    <NMakeCleanCommandLine>cd $(ProjectDir)..
+nmake clean</NMakeCleanCommandLine>
   </PropertyGroup>
-  <ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <PreprocessorDefinitions>LDLANG_EN</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\common\win32\</AdditionalIncludeDirectories>
+    </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="readme.txt" />
@@ -110,6 +122,7 @@
     <ClCompile Include="..\xinterpreted.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\common\win32\freeze.h" />
     <ClInclude Include="..\current_function.hpp" />
     <ClInclude Include="..\git_commit.h" />
     <ClInclude Include="..\intcode.h" />

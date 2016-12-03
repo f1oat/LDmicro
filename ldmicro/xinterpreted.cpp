@@ -32,12 +32,35 @@
 #include "ldmicro.h"
 #include "intcode.h"
 
+#define XIO_TYPE_PENDING		 0
+#define XIO_TYPE_DIG_INPUT       1
+#define XIO_TYPE_DIG_OUTPUT      2
+#define XIO_TYPE_READ_ADC        3
+#define XIO_TYPE_PWM_OUTPUT      4
+#define XIO_TYPE_MODBUS_CONTACT  5
+#define XIO_TYPE_MODBUS_COIL     6
+#define XIO_TYPE_MODBUS_HREG     7
+
 static BYTE OutProg[MAX_INT_OPS];
 
 #define MAX_PLCIO 256
 
 static char *PlcIos[MAX_PLCIO];
 static int PlcIos_size = 0;
+
+static BYTE Map_IO_TYPE(BYTE in)
+{
+	switch (in) {
+	case IO_TYPE_DIG_INPUT: return XIO_TYPE_DIG_INPUT;
+	case IO_TYPE_DIG_OUTPUT: return XIO_TYPE_DIG_OUTPUT;
+	case IO_TYPE_READ_ADC: return XIO_TYPE_READ_ADC;
+	case IO_TYPE_PWM_OUTPUT: return XIO_TYPE_PWM_OUTPUT;
+	case IO_TYPE_MODBUS_CONTACT: return XIO_TYPE_MODBUS_CONTACT;
+	case IO_TYPE_MODBUS_COIL: return XIO_TYPE_MODBUS_COIL;
+	case IO_TYPE_MODBUS_HREG: return XIO_TYPE_MODBUS_HREG;
+	default: return XIO_TYPE_PENDING;
+	}
+}
 
 int PlcIos_AppendAndGet(char *name)
 {
@@ -157,8 +180,12 @@ void CompileXInterpreted(char *outFile)
 			case INT_SET_PWM:
 				OutProg[outPc++] = IntCode[ipc].op;
 				OutProg[outPc++] = AddrForVariable(IntCode[ipc].name1);
-				OutProg[outPc++] = IntCode[ipc].literal & 0xFF;
-				OutProg[outPc++] = IntCode[ipc].literal >> 8;
+				{
+					SWORD val = atoi(IntCode[ipc].name2);
+					OutProg[outPc++] = val & 0xFF;
+					OutProg[outPc++] = val >> 8;
+				}
+				OutProg[outPc++] = AddrForVariable(IntCode[ipc].name3);
 				break;
 
 			case INT_READ_ADC:
@@ -262,8 +289,8 @@ finishIf:
 
 	for (int i = 0; i < Prog.io.count; i++) {
 		PlcProgramSingleIo io = Prog.io.assignment[i];
-		fprintf(f, "%2d %10s %2d %2d %2d %05d\n",
-			i, io.name, io.type,
+		fprintf(f, "%2d %20s %2d %2d %2d %05d\n",
+			i, io.name, Map_IO_TYPE(io.type),
 			GetArduinoPinNumber(io.pin),
 			io.modbus.Slave, io.modbus.Address);
 	}
