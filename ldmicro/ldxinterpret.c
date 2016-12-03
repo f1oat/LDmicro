@@ -188,8 +188,8 @@ void Disassemble(void)
                 break;
 
             case INT_SET_PWM:
-                printf("setpwm(%s, %d Hz)", Symbols[Program[pc+1]], Program[pc+2] + (Program[pc+3]<<8));
-                pc += 4;
+                printf("setpwm(duty=%s, %d Hz, pin=%s)", Symbols[Program[pc+1]], Program[pc+2] + (Program[pc+3]<<8), Symbols[Program[pc+4]]);
+                pc += 5;
                 break;
 
             case INT_READ_ADC:
