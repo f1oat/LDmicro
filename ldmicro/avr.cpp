@@ -1707,7 +1707,7 @@ static BOOL CalcAvrTimerNPulse(double target, int *bestPrescaler, BYTE *cs, int 
 
         //dbp("prescaler=%d divider=%d freq=%f Hz",prescaler, divider, freq);
 
-        err = (int)abs(freq - target);
+        err = (int)fabs(freq - target);
         if((err <= *bestError) && (*bestDivider < divider)) {
             if(divider <= max_divider) {
                 *bestError = err;
@@ -1775,7 +1775,7 @@ BOOL CalcAvrTimerPlcCycle(long long int cycleTimeMicroseconds,
         //dbp("prescaler=%d divider=%d mul=%d T=%d us", *prescaler, *divider ,*prescaler * *divider, cycleTimeMicrosecondsFact);
 
         if(*divider <= max_divider) {
-            int err = abs(1.0*(cycleTimeMicrosecondsFact - cycleTimeMicroseconds));
+            int err = fabs(1.0*(cycleTimeMicrosecondsFact - cycleTimeMicroseconds));
             if((err <= bestError) && (bestDivider < *divider)) {
                 bestError = err;
                 bestPrescaler = *prescaler;
@@ -2985,7 +2985,7 @@ static void CompileFromIntermediate(void)
                     freqSI = SIprefix(freq, SI);
                     sprintf(freqStr, "%s%.3f %sHz    ", freqStr, freqSI, SI);
 
-                    int err = abs(freq - target);
+                    int err = fabs(freq - target);
                     if(err < bestError) {
                         bestError = err;
                         bestPrescale = prescale;
